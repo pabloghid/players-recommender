@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Recommendation</title>
+</head>
+<body>
+    <h1>Player Recommendation</h1>
+
+    <h2>Player Information</h2>
+    <p>ID: {{ player.id }}</p>
+    <p>Name: {{ player.name }}</p>
+    <p>Team: {{ player.team }}</p>
+
+    <h2>Nearest Neighbors</h2>
+    <ul>
+        {% for neighbor in neighbors %}
+            <li>
+                <p>ID: {{ neighbor.id }}</p>
+                <p>Name: {{ neighbor.name }}</p>
+                <p>Team: {{ neighbor.team }}</p>
+                <p>Distance: {{ neighbor.distance }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

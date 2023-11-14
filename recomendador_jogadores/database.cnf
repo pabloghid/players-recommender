@@ -1,0 +1,6 @@
+[client]
+database = recomendador_jogadores
+host = localhost
+user = root
+password = admin
+default-character-set = utf8
