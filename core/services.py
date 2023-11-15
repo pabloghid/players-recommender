@@ -3,7 +3,7 @@ import numpy as np
 import os
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import StandardScaler
-import json
+import html
 
 class PlayerRecommendation:
     METRICS_TO_TRAIN = ['90s', 'Goals', 'Assists', 'Acc_Passes_Percentage', 'Key_Passes-n', 'Tackles', 'Blocks', 
@@ -26,6 +26,7 @@ class PlayerRecommendation:
             if filename.endswith('.csv'):
                 filepath = os.path.join(players_directory, filename)
                 df = pd.read_csv(filepath)
+                df = df.apply(lambda x: html.unescape(str(x)) if isinstance(x, str) else x)
                 dataframes.append(df)
 
         combined_df = pd.concat(dataframes, ignore_index=True)
@@ -92,7 +93,10 @@ class PlayerRecommendation:
         return self.df
 
     def train_nearest_neighbors(self):
-        metrics = ['Goals', 'Assists', 'Acc_Passes_Percentage', 'Key_Passes-n', 'Tackles', 'Blocks', 'Interceptations', 'Tackles_Interceptations', 'Duels_Won_Percentage', 'Shots','ShotsOnTarget', 'ShotsOnTarget_Percentage', 'Goals_Shot', 'Goals_ShotsOnTarget', 'Fouls_Draw-n', 'Fouls_Committed-n', 'Save_Percentage', 'Goals_Conceded-n']
+        metrics = ['Goals', 'Assists', 'Acc_Passes_Percentage', 'Key_Passes-n', 'Tackles', 'Blocks', 'Interceptations', 
+                   'Tackles_Interceptations', 'Duels_Won_Percentage', 'Shots','ShotsOnTarget', 'ShotsOnTarget_Percentage', 
+                   'Goals_Shot', 'Goals_ShotsOnTarget', 'Fouls_Draw-n', 'Fouls_Committed-n', 'Save_Percentage', 'Goals_Conceded-n', 
+                   'Weight_kg', 'Height_cm']
         stats = self.df[metrics].values
         data = StandardScaler().fit_transform(stats)
 
@@ -110,6 +114,13 @@ class PlayerRecommendation:
     
     def get_all_players(self):
         return self.df.to_dict(orient='records')
+    
+    def get_player_by_id(self, player_id):
+        player = self.df[self.df["Id"] == player_id].iloc[0]
+        if not player.empty:
+            return player.to_dict()
+        else:
+            return None
 
     def find_player_neighbors(self, player_id):
         result_json = {}
@@ -117,11 +128,12 @@ class PlayerRecommendation:
         self.df.loc[self.df["Id"] == player_id]
         # Obtenha as informações do jogador alvo
         target_info = {
+            'id': str(player_id),
             'name': self.df['Name'].loc[self.df["Id"] == player_id].values[0],
             'team': self.df['Team'].loc[self.df["Id"] == player_id].values[0]
         }
 
-        result_json['player'] = {'id': str(player_id), 'name': target_info['name'], 'team': target_info['team']}
+        result_json['player'] = target_info
 
         target_index = self.df[self.df["Id"] == player_id].index[0]
 
@@ -129,5 +141,5 @@ class PlayerRecommendation:
         ## Remove o primeiro pois é o próprio jogador
         result_json['neighbors'] = neighbor_list[1:]
         
-        return json.dumps(result_json, indent=2)
+        return result_json
     

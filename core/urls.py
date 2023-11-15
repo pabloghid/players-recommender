@@ -3,7 +3,7 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-    path("", index, name="index"),
-    path('get_player_recommendation/<int:player_id>/', get_player_recommendation, name='get_player_recommendation'),
-    path('players', players, name='players'),
+    path('api/players/', PlayerListAPI.as_view(), name='player-list'),
+    path('api/players/<int:player_id>/', PlayerDetailAPI.as_view(), name='player-detail'),
+    path('api/players/similar/<int:player_id>/', SimilarPlayersAPI.as_view(), name='similar-players'),
 ]
