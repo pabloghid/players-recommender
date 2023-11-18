@@ -84,7 +84,7 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
         "OPTIONS": {
-            "read_default_file": "recomendador_jogadores\database.cnf"
+            "read_default_file": 'recomendador_jogadores/database.cnf'
         }
     }
 }

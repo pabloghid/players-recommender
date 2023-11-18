@@ -6,23 +6,23 @@ from sklearn.preprocessing import StandardScaler
 import html
 
 class PlayerRecommendation:
-    METRICS_TO_TRAIN = ['90s', 'Goals', 'Assists', 'Acc_Passes_Percentage', 'Key_Passes-n', 'Tackles', 'Blocks', 
-                        'Interceptations', 'Tackles_Interceptations', 'Duels_Won_Percentage', 'Shots',
-                        'ShotsOnTarget', 'ShotsOnTarget_Percentage', 'Goals_Shot', 
-                        'Goals_ShotsOnTarget', 'Fouls_Draw-n', 'Fouls_Committed-n', 'Save_Percentage', 
-                        'Goals_Conceded-n'
-                        ]
 
-    def __init__(self, directory='core\data'):
+    def __init__(self, directory='core/data'):
         self.directory = directory
         self.df = None
         self.distances = None
         self.indices = None
+        self.metrics = ['90s', 'Goals', 'Assists', 'Acc_Passes_Percentage', 'Key_Passes-n', 'Tackles', 'Blocks', 
+                        'Interceptations', 'Tackles_Interceptations', 'Duels_Won_Percentage', 'Shots',
+                        'ShotsOnTarget', 'ShotsOnTarget_Percentage', 'Goals_Shot', 
+                        'Goals_ShotsOnTarget', 'Fouls_Draw-n', 'Fouls_Committed-n', 'Save_Percentage', 
+                        'Goals_Conceded-n', 'league_strength'
+                        ]
     
     def group_csv_df(self):
         dataframes = []
-        players_directory = self.directory + '\players'
-        for filename in os.listdir(self.directory + '\players'):
+        players_directory = self.directory + '/players'
+        for filename in os.listdir(self.directory + '/players'):
             if filename.endswith('.csv'):
                 filepath = os.path.join(players_directory, filename)
                 df = pd.read_csv(filepath)
@@ -62,7 +62,8 @@ class PlayerRecommendation:
             'Dribbles_Success': 'sum', 'Fouls_Drawn': 'sum', 'Fouls_Committed': 'sum', 'Tackled_Block': 'sum',
             'Tackled_Intercept': 'sum', 'Tackled_Total': 'sum', 'Duels_Won': 'sum', 'Duels_Total': 'sum',
             'Goals_Assist': 'sum', 'Goals_Total': 'sum', 'Goals_Conceded': 'sum', 'Goals_Saves': 'sum', 'Photo':'first','Logo_Team':'first','Rating': 'mean',
-            'Yellow_Cards': 'sum', 'Red_Cards': 'sum', 'Yellow_Red_Cards': 'sum', 'Weight_kg': 'sum', 'Height_cm': 'sum'
+            'Yellow_Cards': 'sum', 'Red_Cards': 'sum', 'Yellow_Red_Cards': 'sum', 'Weight_kg': 'sum', 'Height_cm': 'sum', 'league_strength': 'first', 'player_photo': 'first',
+            'player_team_logo': 'first', 'player_league_name': 'first'
         }).reset_index()
         new_df['player_name_team'] = new_df['Name'] + ' - ' + new_df['Team']
         self.df = new_df
@@ -93,11 +94,7 @@ class PlayerRecommendation:
         return self.df
 
     def train_nearest_neighbors(self):
-        metrics = ['Goals', 'Assists', 'Acc_Passes_Percentage', 'Key_Passes-n', 'Tackles', 'Blocks', 'Interceptations', 
-                   'Tackles_Interceptations', 'Duels_Won_Percentage', 'Shots','ShotsOnTarget', 'ShotsOnTarget_Percentage', 
-                   'Goals_Shot', 'Goals_ShotsOnTarget', 'Fouls_Draw-n', 'Fouls_Committed-n', 'Save_Percentage', 'Goals_Conceded-n', 
-                   'Weight_kg', 'Height_cm']
-        stats = self.df[metrics].values
+        stats = self.df[self.metrics].values
         data = StandardScaler().fit_transform(stats)
 
         X = np.array(data)
@@ -118,6 +115,7 @@ class PlayerRecommendation:
     def get_player_by_id(self, player_id):
         player = self.df[self.df["Id"] == player_id].iloc[0]
         if not player.empty:
+            print(player)
             return player.to_dict()
         else:
             return None
@@ -126,7 +124,7 @@ class PlayerRecommendation:
         result_json = {}
 
         self.df.loc[self.df["Id"] == player_id]
-        # Obtenha as informações do jogador alvo
+
         target_info = {
             'id': str(player_id),
             'name': self.df['Name'].loc[self.df["Id"] == player_id].values[0],

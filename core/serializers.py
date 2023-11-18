@@ -4,8 +4,11 @@ class PlayerSerializer(serializers.Serializer):
     Id = serializers.IntegerField()
     Name = serializers.CharField()
     Team = serializers.CharField()    
-    Age = serializers.IntegerField()                                          
-
+    Age = serializers.IntegerField()
+    player_photo = serializers.CharField()
+    player_team_logo = serializers.CharField()
+    player_league_name = serializers.CharField()
+    
 class PlayerNeighborSerializer(serializers.Serializer):
     id = serializers.CharField()
     name = serializers.CharField()
