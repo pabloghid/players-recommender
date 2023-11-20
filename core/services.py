@@ -12,11 +12,12 @@ class PlayerRecommendation:
         self.df = None
         self.distances = None
         self.indices = None
-        self.metrics = ['90s', 'Goals', 'Assists', 'Acc_Passes_Percentage', 'Key_Passes-n', 'Tackles', 'Blocks', 
+        self.metrics = ['90s', 'Goals', 'Assists', 'Acc_Passes_Percentage', 'Key_Passes_n', 'Passes_Total_n', 'Tackles', 'Blocks', 
                         'Interceptations', 'Tackles_Interceptations', 'Duels_Won_Percentage', 'Shots',
                         'ShotsOnTarget', 'ShotsOnTarget_Percentage', 'Goals_Shot', 
-                        'Goals_ShotsOnTarget', 'Fouls_Draw-n', 'Fouls_Committed-n', 'Save_Percentage', 
-                        'Goals_Conceded-n', 'league_strength'
+                        'Goals_ShotsOnTarget', 'Dribbles_Attempts_n', 'Dribbles_Success_Percentage',
+                        'Fouls_Draw_n', 'Fouls_Committed_n', 'Save_Percentage', 
+                        'Goals_Conceded_n', 'league_strength'
                         ]
     
     def group_csv_df(self):
@@ -74,7 +75,8 @@ class PlayerRecommendation:
         self.df['Goals'] = (self.df['Goals_Total']/d90s).round(2)
         self.df['Assists'] = (self.df['Goals_Assist']/d90s).round(2)
         self.df['Acc_Passes_Percentage'] = self.df['Accuracy_Passes']
-        self.df['Key_Passes-n'] = (self.df['Key_Passes']/d90s).round(2)
+        self.df['Key_Passes_n'] = (self.df['Key_Passes']/d90s).round(2)
+        self.df['Passes_Total_n'] = (self.df['Total_Passes']/d90s).round(2)
         self.df['Tackles'] = (self.df['Tackled_Total']/d90s).round(2)
         self.df['Blocks'] = (self.df['Tackled_Block']/d90s).round(2)
         self.df['Interceptations'] = (self.df['Tackled_Intercept']/d90s).round(2)
@@ -85,10 +87,12 @@ class PlayerRecommendation:
         self.df['ShotsOnTarget_Percentage'] = (self.df['Shots_On']/self.df['Shots_Total']*100).round(1)
         self.df['Goals_Shot'] = (self.df['Goals']-self.df['Shots']/d90s).round(2)
         self.df['Goals_ShotsOnTarget'] = (self.df['Goals']-self.df['ShotsOnTarget']/d90s).round(2)
-        self.df['Fouls_Draw-n'] = (self.df['Fouls_Drawn']/d90s).round(2)
-        self.df['Fouls_Committed-n'] = (self.df['Fouls_Committed']/d90s).round(2)
+        self.df['Dribbles_Attempts_n'] = (self.df['Dribbles_Attempts']/d90s).round(2)
+        self.df['Dribbles_Success_Percentage'] = (self.df['Dribbles_Success']/self.df['Dribbles_Attempts']*100).round(1)
+        self.df['Fouls_Draw_n'] = (self.df['Fouls_Drawn']/d90s).round(2)
+        self.df['Fouls_Committed_n'] = (self.df['Fouls_Committed']/d90s).round(2)
         self.df['Save_Percentage'] = (self.df['Goals_Saves']/(self.df['Goals_Saves']+self.df['Goals_Conceded'])*100).round(1)
-        self.df['Goals_Conceded-n'] = (self.df['Goals_Conceded']/d90s).round(2)
+        self.df['Goals_Conceded_n'] = (self.df['Goals_Conceded']/d90s).round(2)
         #self.df['Penalty_Percentage'] = (self.df['Goals_Conceded']/self.df['Goals_Conceded']*100)
         self.df = self.df.fillna(0)
         return self.df
