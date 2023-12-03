@@ -1,5 +1,17 @@
 from rest_framework import serializers
+from .models import PlayersList
+from django.contrib.auth.models import User
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'password', 'email']
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
+        user = User.objects.create_user(**validated_data)
+        return user
+    
 class PlayerSerializer(serializers.Serializer):
     Id = serializers.IntegerField()
     Name = serializers.CharField()
@@ -55,3 +67,8 @@ class PlayerNeighborSerializer(serializers.Serializer):
 class SimilarPlayersSerializer(serializers.Serializer):
     player = serializers.DictField(child=serializers.CharField())
     neighbors = PlayerNeighborSerializer(many=True)
+
+class FavoritePlayersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlayersList
+        fields = '__all__'
