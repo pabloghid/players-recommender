@@ -61,16 +61,15 @@ class FavoritePlayersListView(generics.ListCreateAPIView):
     serializer_class = FavoritePlayersSerializer
 
     def list(self, request, *args, **kwargs):
-        # Listar apenas os jogadores do usuário autenticado
         queryset = PlayersList.objects.filter(user=request.user)
-        serializer = FavoritePlayersSerializer(queryset, many=True)
+        serializer = FavoritePlayersSerializer(queryset, many=True, player_rec=player_rec)
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        # Adicionar jogador à lista do usuário autenticado
         request.data['user'] = request.user.id
         serializer = FavoritePlayersSerializer(data=request.data)
         if serializer.is_valid():
+            serializer.validated_data['user'] = request.user
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -80,7 +79,17 @@ class FavoritePlayersDetailView(generics.RetrieveDestroyAPIView):
     serializer_class = FavoritePlayersSerializer
 
     def get_object(self):
-        # Obter jogador da lista do usuário autenticado por player_id
-        player_id = self.kwargs['player_id']
-        obj = PlayersList.objects.get(user=self.request.user, player_id=player_id)
+        player_id = self.kwargs['pk']
+        obj = PlayersList.objects.get(id=player_id, user=self.request.user)
         return obj
+    
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class IsPlayerInFavoritesView(APIView):
+    def get(self, request, player_id, *args, **kwargs):
+        user = request.user
+        is_in_favorites = PlayersList.objects.filter(user=user, player_id=player_id).exists()
+        return Response({'is_in_favorites': is_in_favorites})

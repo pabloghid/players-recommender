@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'password', 'email']
+        fields = ['id', 'username', 'password', 'email']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -38,6 +38,7 @@ class PlayerSerializer(serializers.Serializer):
     Fouls_Drawn = serializers.IntegerField()
     Passes_Total_n = serializers.CharField()
     Dribbles_Success_Percentage = serializers.IntegerField()
+
     ## ataque
     Shots_On = serializers.IntegerField()
     Shots_Total = serializers.IntegerField()
@@ -46,6 +47,7 @@ class PlayerSerializer(serializers.Serializer):
     ShotsOnTarget_Percentage = serializers.IntegerField()
     Goals_Shot = serializers.CharField()
     Goals_ShotsOnTarget = serializers.CharField()
+
     ## defesa
     Fouls_Committed = serializers.IntegerField()
     Tackled_Block = serializers.IntegerField()
@@ -58,6 +60,33 @@ class PlayerSerializer(serializers.Serializer):
     Interceptations = serializers.CharField()
     Tackles_Interceptations = serializers.CharField()
     Duels_Won_Percentage = serializers.IntegerField()  
+
+    ## Goleiro
+    Save_Percentage = serializers.IntegerField()  ## 
+    Goals_Conceded = serializers.IntegerField()  
+    Goals_Saves = serializers.IntegerField()  
+    Goals_Conceded_n = serializers.CharField()    ##
+
+    ## outros
+    Ninety_S = serializers.IntegerField(source='90s')
+    Rating = serializers.FloatField()
+    Yellow_Cards = serializers.CharField()
+    Red_Cards = serializers.CharField()
+    Yellow_Red_Cards = serializers.CharField()
+    Weight_kg = serializers.IntegerField()
+    Height_cm = serializers.IntegerField()
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+
+        if 'Rating' in data and data['Rating'] is not None:
+            data['Rating'] = round(data['Rating'], 2)
+        if 'Height_cm' in data and data['Height_cm'] is not None:
+            data['Height_cm'] = data['Height_cm']/100
+            data['Height_cm'] = round(data['Height_cm'], 2)
+
+
+        return data
 class PlayerNeighborSerializer(serializers.Serializer):
     id = serializers.CharField()
     name = serializers.CharField()
@@ -69,6 +98,21 @@ class SimilarPlayersSerializer(serializers.Serializer):
     neighbors = PlayerNeighborSerializer(many=True)
 
 class FavoritePlayersSerializer(serializers.ModelSerializer):
+    player_name = serializers.SerializerMethodField()
+
     class Meta:
         model = PlayersList
-        fields = '__all__'
+        fields = ['id', 'player_id', 'user', 'created_at', 'updated_at', 'player_name']
+
+    def __init__(self, *args, **kwargs):
+        player_rec = kwargs.pop('player_rec', None)
+        super().__init__(*args, **kwargs)
+        self.player_rec = player_rec
+
+    def get_player_name(self, obj):
+        if self.player_rec and callable(getattr(self.player_rec, 'get_player_by_id', None)):
+            player = self.player_rec.get_player_by_id(obj.player_id)
+            if player:
+                return player
+        return None
+    

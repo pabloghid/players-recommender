@@ -16,4 +16,5 @@ class Migration(migrations.Migration):
             field=models.IntegerField(default=0),
             preserve_default=False,
         ),
+        migrations.RunSQL('ALTER TABLE core_playerslist RENAME COLUMN user_id_id TO user_id;')
     ]
