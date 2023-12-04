@@ -38,15 +38,10 @@ class PlayerRecommendation:
         self.df = combined_df
 
     def clean_data(self, dataset):
-        ## carregar o dataset
         df = dataset
-        ## limpar dribbles past (está zerado)
         df = df.drop(columns=['Dribbles_Past'])
-        ## limpar dados zero
         df = df.fillna(0)
-        ## remover com menos de 3 partidas
         df = df[df['Minutes'] >= 270]
-        ## juntar jogadores iguais (ver se existem dados com o mesmo id e com clube diferente)
 
         self.df = df
 
