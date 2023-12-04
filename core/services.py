@@ -127,14 +127,15 @@ class PlayerRecommendation:
         target_info = {
             'id': str(player_id),
             'name': self.df['Name'].loc[self.df["Id"] == player_id].values[0],
-            'team': self.df['Team'].loc[self.df["Id"] == player_id].values[0]
+            'team': self.df['Team'].loc[self.df["Id"] == player_id].values[0],
+            'photo': self.df['player_photo'].loc[self.df["Id"] == player_id].values[0],
         }
 
         result_json['player'] = target_info
 
         target_index = self.df[self.df["Id"] == player_id].index[0]
 
-        neighbor_list = [{'id': str(self.df['Id'].iloc[idx]), 'name': self.df['Name'].iloc[idx], 'team': self.df['Team'].iloc[idx], 'distance': self.distances[target_index, j]} for j, idx in enumerate(self.indices[target_index])]
+        neighbor_list = [{'id': str(self.df['Id'].iloc[idx]), 'name': self.df['Name'].iloc[idx], 'team': self.df['Team'].iloc[idx], 'photo': self.df['player_photo'].iloc[idx], 'distance': self.distances[target_index, j]} for j, idx in enumerate(self.indices[target_index])]
         ## Remove o primeiro pois é o próprio jogador
         result_json['neighbors'] = neighbor_list[1:]
         
