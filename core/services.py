@@ -12,7 +12,7 @@ class PlayerRecommendation:
         self.df = None
         self.distances = None
         self.indices = None
-        self.metrics = ['90s', 'Goals', 'Assists', 'Acc_Passes_Percentage', 'Key_Passes_n', 'Passes_Total_n', 'Tackles', 'Blocks', 
+        self.metrics = ['Goals', 'Assists', 'Acc_Passes_Percentage', 'Key_Passes_n', 'Passes_Total_n', 'Tackles', 'Blocks', 
                         'Interceptations', 'Tackles_Interceptations', 'Duels_Won_Percentage', 'Shots',
                         'ShotsOnTarget', 'ShotsOnTarget_Percentage', 'Goals_Shot', 
                         'Goals_ShotsOnTarget', 'Dribbles_Attempts_n', 'Dribbles_Success_Percentage',
@@ -65,6 +65,9 @@ class PlayerRecommendation:
         self.df = new_df
 
     def new_metrics(self):
+        mask1 = self.df['Shots_Total'] != 0
+        mask2 = self.df['Shots_On'] != 0
+
         d90s = (self.df['Minutes']/90)
         self.df['90s'] = d90s.round(1)
         self.df['Goals'] = (self.df['Goals_Total']/d90s).round(2)
@@ -80,8 +83,8 @@ class PlayerRecommendation:
         self.df['Shots'] = (self.df['Shots_Total']/d90s).round(2)
         self.df['ShotsOnTarget'] = (self.df['Shots_On']/d90s).round(2)
         self.df['ShotsOnTarget_Percentage'] = (self.df['Shots_On']/self.df['Shots_Total']*100).round(1)
-        self.df['Goals_Shot'] = (self.df['Goals']-self.df['Shots']/d90s).round(2)
-        self.df['Goals_ShotsOnTarget'] = (self.df['Goals']-self.df['ShotsOnTarget']/d90s).round(2)
+        self.df['Goals_Shot'] = np.where(mask1, (self.df['Goals_Total']/self.df['Shots_Total']).round(2), np.nan)
+        self.df['Goals_ShotsOnTarget'] = np.where(mask2, (self.df['Goals_Total']/self.df['Shots_On']).round(2), np.nan)
         self.df['Dribbles_Attempts_n'] = (self.df['Dribbles_Attempts']/d90s).round(2)
         self.df['Dribbles_Success_Percentage'] = (self.df['Dribbles_Success']/self.df['Dribbles_Attempts']*100).round(1)
         self.df['Fouls_Draw_n'] = (self.df['Fouls_Drawn']/d90s).round(2)
