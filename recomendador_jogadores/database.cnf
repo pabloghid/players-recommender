@@ -2,5 +2,5 @@
 database = recomendador_jogadores
 host = localhost
 user = root
-password = 1234
+password = root
 default-character-set = utf8
