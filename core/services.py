@@ -13,11 +13,10 @@ class PlayerRecommendation:
         self.distances = None
         self.indices = None
         self.metrics = ['Goals', 'Assists', 'Acc_Passes_Percentage', 'Key_Passes_n', 'Passes_Total_n', 'Tackles', 'Blocks', 
-                        'Interceptations', 'Tackles_Interceptations', 'Duels_Won_Percentage', 'Shots',
-                        'ShotsOnTarget', 'ShotsOnTarget_Percentage', 'Goals_Shot', 
-                        'Goals_ShotsOnTarget', 'Dribbles_Attempts_n', 'Dribbles_Success_Percentage',
+                        'Interceptations', 'Duels_Won_Percentage', 'Shots',
+                        'ShotsOnTarget_Percentage', 'Goals_ShotsOnTarget', 'Dribbles_Attempts_n', 'Dribbles_Success_Percentage',
                         'Fouls_Draw_n', 'Fouls_Committed_n', 'Save_Percentage', 
-                        'Goals_Conceded_n', 'league_strength'
+                        'Goals_Conceded_n'
                         ]
     
     def group_csv_df(self):
