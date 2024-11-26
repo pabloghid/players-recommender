@@ -57,15 +57,14 @@ class PlayerRecommendation:
             'Dribbles_Success': 'sum', 'Fouls_Drawn': 'sum', 'Fouls_Committed': 'sum', 'Tackled_Block': 'sum',
             'Tackled_Intercept': 'sum', 'Tackled_Total': 'sum', 'Duels_Won': 'sum', 'Duels_Total': 'sum',
             'Goals_Assist': 'sum', 'Goals_Total': 'sum', 'Goals_Conceded': 'sum', 'Goals_Saves': 'sum', 'Photo':'first','Logo_Team':'first','Rating': 'mean',
-            'Yellow_Cards': 'sum', 'Red_Cards': 'sum', 'Yellow_Red_Cards': 'sum', 'Weight_kg': 'sum', 'Height_cm': 'sum', 'league_strength': 'first', 'player_photo': 'first',
+            'Yellow_Cards': 'sum', 'Red_Cards': 'sum', 'Yellow_Red_Cards': 'sum', 'Weight_kg': 'sum', 'Height_cm': 'sum', 'player_photo': 'first',
             'player_team_logo': 'first', 'player_league_name': 'first'
         }).reset_index()
         new_df['player_name_team'] = new_df['Name'] + ' - ' + new_df['Team']
         self.df = new_df
 
     def new_metrics(self):
-        mask1 = self.df['Shots_Total'] != 0
-        mask2 = self.df['Shots_On'] != 0
+        mask = self.df['Shots_On'] != 0
 
         d90s = (self.df['Minutes']/90)
         self.df['90s'] = d90s.round(1)
@@ -77,20 +76,17 @@ class PlayerRecommendation:
         self.df['Tackles'] = (self.df['Tackled_Total']/d90s).round(2)
         self.df['Blocks'] = (self.df['Tackled_Block']/d90s).round(2)
         self.df['Interceptations'] = (self.df['Tackled_Intercept']/d90s).round(2)
-        self.df['Tackles_Interceptations'] = (self.df['Tackled_Intercept']+self.df['Tackled_Block']/d90s).round(2)
         self.df['Duels_Won_Percentage'] = (self.df['Duels_Won']/self.df['Duels_Total']*100).round(1)
         self.df['Shots'] = (self.df['Shots_Total']/d90s).round(2)
-        self.df['ShotsOnTarget'] = (self.df['Shots_On']/d90s).round(2)
         self.df['ShotsOnTarget_Percentage'] = (self.df['Shots_On']/self.df['Shots_Total']*100).round(1)
-        self.df['Goals_Shot'] = np.where(mask1, (self.df['Goals_Total']/self.df['Shots_Total']).round(2), np.nan)
-        self.df['Goals_ShotsOnTarget'] = np.where(mask2, (self.df['Goals_Total']/self.df['Shots_On']).round(2), np.nan)
+        self.df['Goals_ShotsOnTarget'] = np.where(mask, (self.df['Goals_Total']/self.df['Shots_On']).round(2), np.nan)
         self.df['Dribbles_Attempts_n'] = (self.df['Dribbles_Attempts']/d90s).round(2)
         self.df['Dribbles_Success_Percentage'] = (self.df['Dribbles_Success']/self.df['Dribbles_Attempts']*100).round(1)
         self.df['Fouls_Draw_n'] = (self.df['Fouls_Drawn']/d90s).round(2)
         self.df['Fouls_Committed_n'] = (self.df['Fouls_Committed']/d90s).round(2)
         self.df['Save_Percentage'] = (self.df['Goals_Saves']/(self.df['Goals_Saves']+self.df['Goals_Conceded'])*100).round(1)
         self.df['Goals_Conceded_n'] = (self.df['Goals_Conceded']/d90s).round(2)
-        #self.df['Penalty_Percentage'] = (self.df['Goals_Conceded']/self.df['Goals_Conceded']*100)
+
         self.df = self.df.fillna(0)
         return self.df
 

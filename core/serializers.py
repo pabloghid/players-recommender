@@ -1,6 +1,8 @@
-from rest_framework import serializers
-from .models import PlayersList
 from django.contrib.auth.models import User
+from rest_framework import serializers
+
+from .models import PlayersList
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -43,9 +45,7 @@ class PlayerSerializer(serializers.Serializer):
     Shots_On = serializers.IntegerField()
     Shots_Total = serializers.IntegerField()
     Shots = serializers.CharField()
-    ShotsOnTarget = serializers.CharField()
     ShotsOnTarget_Percentage = serializers.IntegerField()
-    Goals_Shot = serializers.CharField()
     Goals_ShotsOnTarget = serializers.CharField()
 
     ## defesa
@@ -58,7 +58,6 @@ class PlayerSerializer(serializers.Serializer):
     Tackles = serializers.CharField()
     Blocks = serializers.CharField()
     Interceptations = serializers.CharField()
-    Tackles_Interceptations = serializers.CharField()
     Duels_Won_Percentage = serializers.IntegerField()  
 
     ## Goleiro
